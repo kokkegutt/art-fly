@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Мозаика с подложкой</title>
+  <style>
+    body { margin: 0; font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', sans-serif; background: #f0f0f0; }
+    canvas { display: block; cursor: pointer; background: #f9f5e8; }
+    .tools { padding: 10px; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: flex; flex-wrap: wrap; align-items: center; }
+    button, input, label { margin: 5px; padding: 5px 10px; font-family: inherit; }
+    #contextMenu, #shapeContextMenu { 
+      position: fixed; 
+      display: none; 
+      background: rgba(255, 255, 255, 0.95); 
+      border: none;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      z-index: 100;
+      backdrop-filter: blur(5px);
+      min-width: 200px;
+      padding: 5px 0;
+    }
+    #contextMenu button, #shapeContextMenu button { 
+      display: block; 
+      width: 100%; 
+      padding: 8px 16px; 
+      border: none; 
+      background: none; 
+      text-align: left;
+      font-family: 'Segoe UI', Roboto, sans-serif;
+      font-size: 14px;
+      color: #333;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    #contextMenu button:hover, #shapeContextMenu button:hover { 
+      background: rgba(0, 0, 0, 0.05); 
+    }
+    .tool-group {
+      border: 1px solid #eee;
+      border-radius: 6px;
+      padding: 5px;
+      margin: 5px;
+      background: #f9f9f9;
+    }
+    .history-buttons {
+      display: flex;
+    }
+    .shape-type {
+      font-weight: 500;
+      color: #555;
+      margin-right: 8px;
+    }
+    .opacity-control {
+      display: flex;
+      align-items: center;
+      margin: 5px;
+    }
+    .opacity-control label {
+      min-width: 80px;
+      margin-right: 5px;
+    }
+    .opacity-control input {
+      width: 80px;
+    }
+    .save-buttons {
+      display: flex;
+      flex-direction: column;
+    }
+  </style>
+</head>
+<body>
+  <div class="tools">
+    <div class="tool-group">
+      <input type="file" id="imageUpload" accept="image/*">
+    </div>
+    
+    <div class="tool-group opacity-controls">
+      <div class="opacity-control">
+        <label for="imageOpacity">Изображение</label>
+        <input type="range" id="imageOpacity" min="0" max="100" value="100">
+      </div>
+      <div class="opacity-control">
+        <label for="mosaicOpacity">Мозаика</label>
+        <input type="range" id="mosaicOpacity" min="0" max="100" value="100">
+      </div>
+    </div>
+    
+    <div class="tool-group">
+      <button id="symmetry">Включить симметрию</button>
+      <label>Размер фигуры: <input type="range" id="shapeSize" min="20" max="100" value="40"></label>
+    </div>
+    
+    <div class="tool-group">
+      <label>Цвет обводки: <input type="color" id="strokeColor" value="#666666"></label>
+      <label>Толщина обводки: <input type="range" id="strokeWidth" min="1" max="5" value="1"></label>
+    </div>
+    
+    <div class="tool-group">
+      <button id="deleteSelected">Удалить выделенное (Del)</button>
+    </div>
+    
+    <div class="tool-group history-buttons">
+      <button id="undoBtn" title="Undo (Ctrl+Z)">← Отменить</button>
+      <button id="redoBtn" title="Redo (Ctrl+Y)">Повторить →</button>
+    </div>
+    
+    <div class="tool-group save-buttons">
+      <button id="saveSVG">Сохранить SVG</button>
+      <button id="savePNG">Сохранить PNG</button>
+    </div>
+  </div>
+  
+  <div id="contextMenu">
+    <button id="addTriangle"><span class="shape-type">▲</span>Добавить треугольник</button>
+    <button id="addSquare"><span class="shape-type">■</span>Добавить квадрат</button>
+    <button id="addHexagon"><span class="shape-type">⬢</span>Добавить шестиугольник</button>
+  </div>
+  
+  <div id="shapeContextMenu">
+    <button id="splitIntoTriangles"><span class="shape-type">🔺</span>Разделить на треугольники</button>
+  </div>
+  
+  <canvas id="canvas"></canvas>
+  <script src="script.js"></script>
+</body>
+</html>
