@@ -3,14 +3,60 @@
 <head>
   <title>Мозаика с подложкой</title>
   <style>
-    body { margin: 0; font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', sans-serif; background: #f0f0f0; }
-    canvas { display: block; cursor: pointer; background: #f9f5e8; }
-    .tools { padding: 10px; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: flex; flex-wrap: wrap; align-items: center; }
-    button, input, label { margin: 5px; padding: 5px 10px; font-family: inherit; }
+    body { 
+      margin: 0; 
+      font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', sans-serif; 
+      background: #f0f0f0; 
+    }
+    canvas { 
+      display: block; 
+      cursor: pointer; 
+      background: #f9f5e8; 
+    }
+    .tools { 
+      padding: 8px 12px; 
+      background: #fff; 
+      box-shadow: 0 2px 10px rgba(0,0,0,0.08); 
+      display: flex; 
+      flex-wrap: wrap; 
+      align-items: center; 
+      gap: 8px;
+    }
+    button, input, label { 
+      margin: 0;
+      font-family: inherit; 
+      font-size: 13px;
+    }
+    button {
+      padding: 6px 12px;
+      background: #f5f5f5;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      color: #333;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    button:hover {
+      background: #e9e9e9;
+      border-color: #ccc;
+    }
+    button:active {
+      background: #ddd;
+    }
+    input[type="range"] {
+      width: 80px;
+    }
+    input[type="color"] {
+      width: 24px;
+      height: 24px;
+      padding: 2px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
     #contextMenu, #shapeContextMenu { 
       position: fixed; 
       display: none; 
-      background: rgba(255, 255, 255, 0.95); 
+      background: rgba(255, 255, 255, 0.98); 
       border: none;
       border-radius: 8px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.15);
@@ -36,77 +82,96 @@
       background: rgba(0, 0, 0, 0.05); 
     }
     .tool-group {
-      border: 1px solid #eee;
-      border-radius: 6px;
-      padding: 5px;
-      margin: 5px;
-      background: #f9f9f9;
-    }
-    .history-buttons {
       display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 10px;
+      border-radius: 6px;
+      background: #f8f8f8;
+      border: 1px solid #e0e0e0;
+    }
+    .tool-group.compact {
+      padding: 4px 8px;
+    }
+    .tool-group.vertical {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    .tool-label {
+      font-size: 12px;
+      color: #666;
+      white-space: nowrap;
     }
     .shape-type {
       font-weight: 500;
       color: #555;
       margin-right: 8px;
     }
-    .opacity-control {
+    .icon-button {
       display: flex;
       align-items: center;
-      margin: 5px;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      padding: 0;
     }
-    .opacity-control label {
-      min-width: 80px;
-      margin-right: 5px;
-    }
-    .opacity-control input {
-      width: 80px;
-    }
-    .save-buttons {
-      display: flex;
-      flex-direction: column;
+    .separator {
+      width: 1px;
+      height: 24px;
+      background: #e0e0e0;
+      margin: 0 4px;
     }
   </style>
 </head>
 <body>
   <div class="tools">
-    <div class="tool-group">
-      <input type="file" id="imageUpload" accept="image/*">
+    <!-- Группа загрузки -->
+    <div class="tool-group compact">
+      <input type="file" id="imageUpload" accept="image/*" style="display: none;">
+      <button id="uploadBtn" title="Загрузить изображение">📁</button>
     </div>
     
-    <div class="tool-group opacity-controls">
-      <div class="opacity-control">
-        <label for="imageOpacity">Изображение</label>
+    <!-- Группа прозрачности -->
+    <div class="tool-group vertical">
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <span class="tool-label">Изобр.</span>
         <input type="range" id="imageOpacity" min="0" max="100" value="100">
       </div>
-      <div class="opacity-control">
-        <label for="mosaicOpacity">Мозаика</label>
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <span class="tool-label">Мозаика</span>
         <input type="range" id="mosaicOpacity" min="0" max="100" value="100">
       </div>
     </div>
     
-    <div class="tool-group">
-      <button id="symmetry">Включить симметрию</button>
-      <label>Размер фигуры: <input type="range" id="shapeSize" min="20" max="100" value="40"></label>
+    <!-- Группа инструментов -->
+    <div class="tool-group compact">
+      <button id="symmetry" title="Включить симметрию">🔄</button>
+      <span class="tool-label">Размер:</span>
+      <input type="range" id="shapeSize" min="20" max="100" value="40" style="width: 70px;">
     </div>
     
-    <div class="tool-group">
-      <label>Цвет обводки: <input type="color" id="strokeColor" value="#666666"></label>
-      <label>Толщина обводки: <input type="range" id="strokeWidth" min="1" max="5" value="1"></label>
+    <!-- Группа стилей -->
+    <div class="tool-group compact">
+      <input type="color" id="strokeColor" value="#666666" title="Цвет обводки">
+      <span class="tool-label">Толщ.:</span>
+      <input type="range" id="strokeWidth" min="1" max="5" value="1" style="width: 50px;">
     </div>
     
-    <div class="tool-group">
-      <button id="deleteSelected">Удалить выделенное (Del)</button>
+    <div class="separator"></div>
+    
+    <!-- Группа действий -->
+    <div class="tool-group compact">
+      <button id="deleteSelected" title="Удалить выделенное (Del)" class="icon-button">🗑️</button>
+      <button id="undoBtn" title="Отменить (Ctrl+Z)" class="icon-button">↩️</button>
+      <button id="redoBtn" title="Повторить (Ctrl+Y)" class="icon-button">↪️</button>
     </div>
     
-    <div class="tool-group history-buttons">
-      <button id="undoBtn" title="Undo (Ctrl+Z)">← Отменить</button>
-      <button id="redoBtn" title="Redo (Ctrl+Y)">Повторить →</button>
-    </div>
+    <div class="separator"></div>
     
-    <div class="tool-group save-buttons">
-      <button id="saveSVG">Сохранить SVG</button>
-      <button id="savePNG">Сохранить PNG</button>
+    <!-- Группа сохранения -->
+    <div class="tool-group compact">
+      <button id="saveSVG" title="Сохранить SVG">SVG</button>
+      <button id="savePNG" title="Сохранить PNG">PNG</button>
     </div>
   </div>
   
@@ -121,6 +186,12 @@
   </div>
   
   <canvas id="canvas"></canvas>
+  <script>
+    // Добавляем обработчик для кнопки загрузки
+    document.getElementById('uploadBtn').addEventListener('click', function() {
+      document.getElementById('imageUpload').click();
+    });
+  </script>
   <script src="script.js"></script>
 </body>
 </html>
